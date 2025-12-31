@@ -2,6 +2,7 @@ import fmm3dpy as fmm
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import time
 
 '''
 Given 1000 source charge electrons uniformly randomly distributed in a 1m x 1m area on the xy plane,
@@ -11,6 +12,8 @@ use FMM to find electric field at 1000 uniformly randomly distributed target poi
 Plot electrons and electric field in 3d
 
 '''
+skip = 1000
+
 eps = 10**(-5)
 e_charge = -1.6e-19 #charge of an electron in coulombs
 e_permitivity_vac = 8.854e-12
@@ -21,12 +24,12 @@ fig = plt.figure(figsize=(10, 8))
 ax = fig.add_subplot(projection='3d')
 
 #generate source locations
-n = 1000 #1000 sources
+n = (int)(10e6) #1000 sources
 sources = np.random.uniform(0,1,(3,n)) #generate x,y,z coords
 sources[2] = np.zeros(n) #set all the z coords to 0
 
 #plot electrons
-ax.scatter(sources[0], sources[1], sources[2], c='m')
+ax.scatter(sources[0][::skip], sources[1][::skip], sources[2][::skip], c='m')
 
 #setup charge values (all will have charge of 1 electron)
 charges = np.full(n, e_charge)
@@ -34,38 +37,53 @@ charges = np.full(n, e_charge)
 #print(charges)
 
 #generate target locations
-nt = 1000 #1000 targets
+nt = n #1000 targets
 targets = np.random.uniform(0,1,(3,nt)) #generate x,y,z coords
 #targets=np.array(sources)
 targets[2] = np.ones(nt) #set all the z coords to 1
-print(targets)
+#print(targets)
 
-out = fmm.lfmm3d(eps=eps,sources=sources,charges=charges,targets=targets,pg=0,pgt=2)
+#timer
+start_time = time.perf_counter()
+
+out = fmm.lfmm3d(eps=eps,sources=sources,charges=charges,targets=targets,pg=2,pgt=2)
 grad = out.gradtarg
-print(grad)
+grad_s = out.grad
+#print(grad)
 e_field = grad * -k_e #scale gradient by coulomb constant
-print(e_field)
-
-
-# Make the grid
-x, y, z = targets
-u, v, w = e_field
+e_field_s = grad_s * -k_e 
+end_time = time.perf_counter()
+time_elapsed = end_time - start_time
+print("time to calculate e_field at targets: ")
+print(time_elapsed)
+#print(e_field)
 
 #calculate the magnitudes of electric field
 mag_e_field = np.linalg.norm(e_field, axis=0)
-print("mag e field:\n")
-print(mag_e_field)
+#print("mag e field:\n")
+#print(mag_e_field)
+end_time = time.perf_counter()
+time_elapsed = end_time - start_time
+print("time to calculate e_field_mag at targets: ")
+print(time_elapsed)
 
-#non-colorful plotting of e_field vectors
-#ax.quiver(x, y, z, u, v, w, length=0.1, normalize=True)
 
 #map electric field magnitudes to different colors
 norm = mpl.colors.Normalize(vmin=np.min(mag_e_field), vmax=np.max(mag_e_field))
 cmap = mpl.colormaps['viridis']
 colors = cmap(norm(mag_e_field))
 
+
+'''
+# Make the grid
+x, y, z = targets
+u, v, w = e_field
+
+#non-colorful plotting of e_field vectors
+#ax.quiver(x, y, z, u, v, w, length=0.1, normalize=True)
+
 #plot colorful e_field vectors
-quiver = ax.quiver(x, y, z, u, v, w, length=0.1, normalize=True, colors=colors)
+quiver = ax.quiver(x[::skip], y[::skip], z[::skip], u[::skip], v[::skip], w[::skip], length=0.1, normalize=True, colors=colors[::skip])
 plt.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap='viridis'), ax=ax, label='Electric Field [V/m]')
 
 
@@ -87,11 +105,11 @@ ax.set_ylabel('Y Pos [m]')
 
 plt.show()
 
+'''
 
 
 
-
-
+'''
 #attempt with maxwell wrapper-----------------------------------------------------------
 print("\nmaxwell wrapper---------------------------------------\n")
 #zk = 1.1 + 1j*0
@@ -129,3 +147,4 @@ ax.set_ylabel('Y Axis')
 ax.set_zlabel('Z Axis')
 
 plt.show()
+'''
