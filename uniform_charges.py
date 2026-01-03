@@ -83,9 +83,10 @@ print("time to calculate e_field at sources and targets:\n" + str(time_elapsed_s
 
 #calculate the magnitudes of electric field at targets
 mag_e_field_t = np.linalg.norm(e_field_t, axis=0)
-#print("mag e field:\n" + str(mag_e_field_t) + "\n")
+print("mag e field:\n" + str(mag_e_field_t) + "\n")
 
-
+mag_e_field_st_t = np.linalg.norm(e_field_st_t, axis=0)
+print("mag e field:\n" + str(mag_e_field_st_t) + "\n")
 
 #plotting---------------------------------------------------------------------
 skip = 1000 #plot every 1000 points so graphic doesnt take too long to load
