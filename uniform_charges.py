@@ -72,7 +72,7 @@ out_st = fmm.lfmm3d(eps=eps,sources=sources,charges=charges,targets=targets,pg=2
 grad_st_s = out_st.grad
 e_field_st_s  = grad_st_s * -k_e #sources e_field
 
-grad_st_t = out_st.gradtarg 
+grad_st_t = out_st.gradtarg
 e_field_st_t  = grad_st_t * -k_e #targets e_field
 
 end_time_st = time.perf_counter() #stop timer
@@ -87,6 +87,20 @@ print("mag e field:\n" + str(mag_e_field_t) + "\n")
 
 mag_e_field_st_t = np.linalg.norm(e_field_st_t, axis=0)
 print("mag e field:\n" + str(mag_e_field_st_t) + "\n")
+
+mag_e_field_s = np.linalg.norm(e_field_s, axis=0)
+print("mag e field:\n" + str(mag_e_field_s) + "\n")
+
+mag_e_field_st_s = np.linalg.norm(e_field_st_s, axis=0)
+print("mag e field:\n" + str(mag_e_field_st_s) + "\n")
+
+
+print(np.array_equal(e_field_t, e_field_st_t))
+print(np.array_equal(mag_e_field_t, mag_e_field_st_t))
+print(np.array_equal(np.round(e_field_s, decimals=5), np.round(e_field_st_s, decimals=5)))
+print(np.array_equal(np.round(mag_e_field_s, decimals=5), np.round(mag_e_field_st_s, decimals=5)))
+
+
 
 #plotting---------------------------------------------------------------------
 skip = 1000 #plot every 1000 points so graphic doesnt take too long to load
